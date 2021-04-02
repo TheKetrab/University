@@ -1,0 +1,17 @@
+﻿@using ShopMVC.Code
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+W twoim koszyku znajduje się:
+
+@foreach (var item in ShoppingCart.GetContent())
+{
+    if (item != null)
+    {
+        <div>@item.Name @Html.ActionLink("Usuń", "Remove", new { item.ID })</div>
+    }
+}

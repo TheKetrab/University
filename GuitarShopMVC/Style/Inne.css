@@ -1,0 +1,14 @@
+﻿button, input, select, textarea {
+    background-color: black;
+}
+
+.MyButtonClass {
+
+    background-color: black;
+    color: white;
+    display: block;
+    width: 100px;
+    height: auto;
+   /*text-indent: -9999px;*/ /* hides the link text */
+}
+

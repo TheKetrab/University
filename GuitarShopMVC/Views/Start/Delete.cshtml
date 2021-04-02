@@ -1,0 +1,33 @@
+﻿@model ShopMVC.Models.Start.ShopItemModel
+@using ShopMVC.Code
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete</h2>
+
+@using (Html.BeginForm("Delete","Start", FormMethod.Post))
+{
+    <div>
+        <h1>Czy na pewno chcesz usunąć ten przedmiot?</h1>
+        <h1>przedmiot nr @Model.ID</h1>
+        <div class="ListItemBox">
+            <div id="itemImage">
+                <img src="@Model.ImgSrc" class="ListItemIcon" />
+            </div>
+            <div id="content" class="ListItemContent">
+                <div class="ListItemInfo">
+                    <label id="NameLabel" class="ListItemName">@Model.Name</label>
+                    <label id="ValueLabel" class="ListItemValue">@Html.Raw(Model.Value + " PLN")</label>
+                </div>
+                <label id="DescriptionLabel">@Model.Description</label>
+            </div>
+        </div>
+
+        <button style="background-color: black;">Usuń</button>
+        @Html.LinkButton("Anuluj", "/Start/Index")
+
+    </div>
+
+}

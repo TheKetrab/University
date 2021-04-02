@@ -1,0 +1,184 @@
+#lang racket
+
+;; MP 2018 - Li4
+;; Bartlomiej Grochowski
+;; nr 300 951
+
+(define (inc n)
+  (+ n 1))
+
+;;; ordered elements
+(define (make-elem pri val)
+  (cons pri val))
+
+(define (elem-priority x)
+  (car x))
+
+(define (elem-val x)
+  (cdr x))
+
+;;; leftist heaps (after Okasaki)
+
+;; data representation
+(define leaf 'leaf)
+
+(define (leaf? h) (eq? 'leaf h))
+
+(define (hnode? h)
+  (and (list? h)
+       (= 5 (length h))
+       (eq? (car h) 'hnode)
+       (natural? (caddr h))))
+
+(define (make-node elem heap-a heap-b)
+  ; zakladamy ́ze porzadek kopca zostanie zachowany
+  ; czyli ze priorytet elementu jest mniejszy niz
+  ; priorytety poddrzew heap-a i heap-b
+  ; (mniejszy, bo heap-min wraca element
+  ; znajdujacy sie w korzeniu drzewa)
+
+  (if (and [pair? elem]                                     ; sprawdzamy
+           [or (hnode? heap-a) (leaf? heap-a)]              ; poprawnosc
+           [or (hnode? heap-b) (leaf? heap-b)])             ; argumentow
+           
+      (let ([rank-a (rank heap-a)]                          ; pobieramy wartosci
+            [rank-b (rank heap-b)])                         ; rang i je porownujemy
+        (if (>= rank-a rank-b)                              ;
+            (list 'hnode elem (inc rank-b) heap-a heap-b)   ; wybieramy, co jest prawym,
+            (list 'hnode elem (inc rank-a) heap-b heap-a))) ; a co lewym poddrzewem
+      (error "NIEPOPRAWNE ARGUMENTY !")))
+
+(define (node-elem h)
+  (second h))
+
+(define (node-left h)
+  (fourth h))
+
+(define (node-right h)
+  (fifth h))
+
+(define (hord? p h)
+  (or (leaf? h)
+      (<= p (elem-priority (node-elem h)))))
+
+(define (heap? h)
+  (or (leaf? h)
+      (and (hnode? h)
+           (heap? (node-left h))
+           (heap? (node-right h))
+           (<= (rank (node-right h))
+               (rank (node-left h)))
+           (= (rank h) (inc (rank (node-right h))))
+           (hord? (elem-priority (node-elem h))
+                  (node-left h))
+           (hord? (elem-priority (node-elem h))
+                  (node-right h)))))
+
+(define (rank h)
+  (if (leaf? h)
+      0
+      (third h)))
+
+;; operations
+
+(define empty-heap leaf)
+
+(define (heap-empty? h)
+  (leaf? h))
+
+(define (heap-insert elt heap)
+  (heap-merge heap (make-node elt leaf leaf)))
+
+(define (heap-min heap)
+  (node-elem heap))
+
+(define (heap-pop heap)
+  (heap-merge (node-left heap) (node-right heap)))
+
+(define (heap-merge h1 h2)
+  (cond
+   [(leaf? h1) h2]
+   [(leaf? h2) h1]
+   [else (let ([min-prio-elem-h1 (heap-min h1)]          ; priorytet elementu h1
+                [min-prio-elem-h2 (heap-min h2)])        ; priorytet elementu h2
+
+            (if (<= (elem-priority min-prio-elem-h1)
+                    (elem-priority min-prio-elem-h2))
+
+                (let ([e min-prio-elem-h1]               ; jesli priorytet elementu h1
+                       [hl (node-left h1)]               ; byl mniejszy to odpowiednio
+                       [hr (node-right h1)]              ; nazywamy zmienne
+                       [h h2])
+                  (make-node e (heap-merge hr h) hl))    ; rekurencyjne wywolania
+
+                (let ([e min-prio-elem-h2]               ; -> symetrycznie
+                       [hl (node-left h2)]
+                       [hr (node-right h2)]
+                       [h h1])
+                  (make-node e (heap-merge hr h) hl))))]))
+
+
+;;; heapsort. sorts a list of numbers.
+(define (heapsort xs)
+  (define (popAll h)
+    (if (heap-empty? h)
+        null
+        (cons (elem-val (heap-min h)) (popAll (heap-pop h)))))
+  (let ((h (foldl (lambda (x h)
+                    (heap-insert (make-elem x x) h))
+            empty-heap xs)))
+    (popAll h)))
+
+;;; check that a list is sorted (useful for longish lists)
+(define (sorted? xs)
+  (cond [(null? xs)              true]
+        [(null? (cdr xs))        true]
+        [(<= (car xs) (cadr xs)) (sorted? (cdr xs))]
+        [else                    false]))
+
+;;; generate a list of random numbers of a given length
+(define (randlist len max)
+  (define (aux len lst)
+    (if (= len 0)
+        lst
+        (aux (- len 1) (cons (random max) lst))))
+  (aux len null))
+
+
+
+
+;; ---- testy ----
+
+;; przyklad poprawnosci
+(define my-list (randlist 10 1000))
+my-list
+(define my-list-sorted (heapsort my-list))
+my-list-sorted
+
+;; generujemy rozne testy -> listy do sortowania roznej dlugosci
+;; (oprocz listy pustej) zawierajace liczby z danego przedzialu [0,r-1]
+;; n - ile testow, l - max dlugosc list, r - z jakiego przedzialu liczby
+(define (multi-test n l r)
+  (define (multi-test-iter i)
+    (if (= i 0)
+        #t
+        (let* ([lst (randlist (inc (random l)) r)]
+               [success? (sorted? (heapsort lst))])
+          (if success?
+              (multi-test-iter (- i 1))
+              #f))))
+  (multi-test-iter n))
+                   
+;; typowe, normalne, losowe listy
+(multi-test 100 100 10000)
+
+; dziwne, zlosliwe przypadki
+(multi-test 10 1 1) ; lista zlozona z zera
+(multi-test 10 10 1) ; same zera
+
+(sorted? (heapsort '(0 1 2 3 4 5))) ; lista na wejsciu posortowana
+(sorted? (heapsort '(5 4 3 2 1 0))) ; lista odwrocona
+
+
+;; kilkukrotne odpalenie programu za kazdym razem konczylo
+;; sie samymi odpowiedziami #t

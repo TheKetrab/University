@@ -1,0 +1,24 @@
+﻿@model ShopMVC.Models.Start.ShopItemModel
+@using ShopMVC.Code
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Create</h2>
+
+@using (Html.BeginForm("Create", "Start", FormMethod.Post))
+{
+    <div>
+        <div>Nazwa: @Html.TextBoxFor(m => m.Name, new { Style = "background-color:black;" })</div>
+        <div>Wartość: @Html.TextBoxFor(m => m.Value, new { Style = "background-color:black;" })</div>
+        <div>Opis: @Html.TextAreaFor(m => m.Description, new { Style = "background-color:black;" })</div>
+        <div>Obrazek: @Html.TextBoxFor(m => m.ImgSrc, new { Style = "background-color:black;" })</div>
+        <button style="background-color: black;">Utwórz</button>
+        @Html.LinkButton("Anuluj", "/Start/Index")
+    </div>
+
+    <div class="ErrorText">
+        @ViewBag.ErrorMessage
+    </div>
+}

@@ -1,0 +1,104 @@
+﻿@using PagedList.Mvc
+@using ShopMVC.Code
+@model ShopMVC.Models.Start.IndexModel
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<aside id="AsideShoppingCart">
+
+    <div class="AsideBox">
+        @Html.ActionLink("Przejdź do koszyka", "Index", "ShoppingCart")
+    </div>
+</aside>
+
+
+<aside id="AsideFilter">
+
+    @using (Html.BeginForm("Index", "Start", FormMethod.Get))
+    {
+
+        <div class="AsideBox">
+            <div>Sortuj według:</div>
+            @Html.DropDownListFor(m => m.OrderBy, new List<SelectListItem>
+            {
+                new SelectListItem { Text = "Domyślnie", Value = "Default", Selected=true},
+                new SelectListItem { Text = "Nazwa (A-Z)", Value = "Name"},
+                new SelectListItem { Text = "Nazwa (Z-A)", Value = "Name DESC"},
+                new SelectListItem { Text = "Cena rosnąco", Value = "Value"},
+                new SelectListItem { Text = "Cena malejąco", Value = "Value DESC"}
+            }, new { Style = "background:black" })
+        </div>
+
+        <div class="AsideBox">
+            Cena od @Html.TextBoxFor(m => m.ValueFrom, new { Style = "width: 50px;" })
+            do @Html.TextBoxFor(m => m.ValueTo, new { Style = "width: 50px;" })
+        </div>
+
+        <div class="AsideBox">
+            <div>Znajdź po nazwie:</div>
+            @Html.TextBoxFor(m => m.SearchString)
+        </div>
+
+        <button style="background-color:black">Filtruj</button>
+
+    }
+
+
+</aside>
+
+
+@if (User.IsInRole("admin"))
+{
+    @Html.ActionLink("Dodaj", "Create")
+    <br />
+    @Html.ActionLink("Generuj bazę danych", "Regenerate")
+}
+
+@foreach (var item in ViewBag.Pager.Items)
+{
+
+    <div class="ListItemBox">
+        <div id="itemImage">
+            <img src="@item.ImgSrc" class="ListItemIcon" />
+        </div>
+        <div id="content" class="ListItemContent">
+            <div class="ListItemInfo">
+                <label id="NameLabel" class="ListItemName">@item.Name</label>
+                <label id="ValueLabel" class="ListItemValue">@Html.Raw(item.Value + " PLN")</label>
+            </div>
+            <label id="DescriptionLabel" class="ListDescription">@item.Description</label>
+        </div>
+        <div>
+            @Html.ActionLink("Dodaj do koszyka", "Add", "ShoppingCart", new { item.ID }, new { })
+        </div>
+
+
+        @if (User.IsInRole("admin"))
+        {
+            <div>
+                @Html.ActionLink("Edytuj", "Edit", new { item.ID })
+            </div>
+            <div>
+                @Html.ActionLink("Usuń", "Delete", new { item.ID })
+            </div>
+
+        }
+
+    </div>
+
+}
+
+Strona @ViewBag.Pager.PageNumber z @ViewBag.Pager.PagesCount
+
+@{
+    int a = (int)ViewBag.Pager.PageNumber;
+    int b = (int)ViewBag.Pager.PagesCount;
+
+    var qs = Request.QueryString;
+}
+@Html.MyPager(a,b,qs)
+

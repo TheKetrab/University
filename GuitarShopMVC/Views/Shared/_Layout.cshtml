@@ -1,0 +1,91 @@
+﻿@using ShopMVC.Code
+@using ShopMVC
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href='@VersionInfoForStaticAssets.GetVersionInfoUrl("/Style/ListStyle.css")' rel="stylesheet" type="text/css" />
+    <link href='@VersionInfoForStaticAssets.GetVersionInfoUrl("/Style/WebStyle.css")' rel="stylesheet" type="text/css" />
+    <link href='@VersionInfoForStaticAssets.GetVersionInfoUrl("/Style/Inne.css")' rel="stylesheet" type="text/css" />
+    <script src="~/Scripts/modernizr-2.8.3.js"></script>
+    <style>
+
+        body {
+            color: white;
+        }
+
+        .AsideBox {
+            border: solid 1px lightgrey;
+            padding: 5px;
+            margin: 5px;
+        }
+
+        aside {
+            background-color: black;
+            border: solid 5px white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #AsideShoppingCart {
+            position: absolute;
+            right: 50px;
+            top: 150px;
+        }
+
+        #AsideFilter {
+            position: absolute;
+            right: 50px;
+            top: 350px;
+        }
+    </style>
+</head>
+<body>
+
+
+
+    
+        <div class="navbar navbar-inverse navbar-fixed-top navbar-dark">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <div class="navbar navbar-light" style="position: absolute; left: 10px; top: 10px;">
+                        @Html.BuildBreadcrumbs()
+                    </div>
+
+                    @Html.UserInfo()
+
+
+                </div>
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                    </ul>
+                </div>
+            </div>
+        </div>
+    
+
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+        </footer>
+    </div>
+
+    <script src="~/Scripts/jquery-3.3.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+</body>
+</html>
