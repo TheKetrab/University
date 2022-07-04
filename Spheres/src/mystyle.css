@@ -1,0 +1,6 @@
+GtkWindow {
+	background-image: url("background.png");
+    font-style: italic;
+    font-weight: 800;
+    padding: 10px 10px 10px 10px;
+}
